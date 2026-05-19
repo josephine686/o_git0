@@ -108,80 +108,96 @@ paths:
 
 
 
-  /transactions:
+  /accounts:
     get:
       security:
         - Bearer: []
+
       tags:
-        - Transactions info
-      summary: All transactions
-      description: Return all transactions for user
+        - Transactions
+
+      summary: Get user accounts
+
       produces:
         - application/json
+
       responses:
-        '200':
+        "200":
           description: Success
           schema:
-            $ref: '#/definitions/Transactions'
-        '403':
-          description: Forbidden
-        '500':
-          description: Internal Server Error
+            $ref: "#/definitions/Account"
 
-  /transactions/{transactionId}:
+  /accounts/{accountId}/transactions:
     get:
       security:
         - Bearer: []
+
       tags:
-        - Transactions info
-      summary: Get transaction detail
-      description: Return detail informations
+        - Transactions
+
+      summary: Get account transactions
+
+      produces:
+        - application/json
+
       parameters:
-        - name: transactionId
+        - name: accountId
           in: path
           required: true
           type: integer
+
       responses:
-        '200':
+        "200":
           description: Success
           schema:
-            $ref: '#/definitions/Transaction'
-        '403':
-          description: Forbidden
-        '404':
-          description: Transaction not found
-        '500':
-          description: Internal Server Error
+            $ref: "#/definitions/Transaction"
 
+  /accounts/{accountId}/transactions/{transactionId}:
     patch:
-      tags:
-        - Transactions info
       security:
         - Bearer: []
-      summary: Update transaction detail
-      description: Update detail transaction
+
+      tags:
+        - Transactions
+
+      summary: Update transaction
+
+      consumes:
+        - application/json
+
       parameters:
+        - name: accountId
+          in: path
+          required: true
+          type: integer
+
         - name: transactionId
           in: path
           required: true
           type: integer
+
         - name: body
           in: body
           required: true
           schema:
-            $ref: '#/definitions/TransactionDescription'
+            $ref: "#/definitions/TransactionUpdate"
+
       responses:
-        '200':
+        "200":
           description: Updated successfully
           schema:
-            $ref: '#/definitions/Transaction'
-        '400':
+            $ref: "#/definitions/Transaction"
+
+        "400":
           description: Invalid request
-        '403':
+
+        "403":
           description: Forbidden
-        '404':
+
+        "404":
           description: Transaction not found
-        '500':
+
+        "500":
           description: Internal Server Error
 
 
@@ -255,27 +271,60 @@ definitions:
 
 
 
-  Transaction:
+  Account:
     type: object
     properties:
       id:
         type: integer
+
+      argentBankChecking:
+        type: number
+        format: float
+
+      availableBalance:
+        type: number
+        format: float
+
+  Transaction:
+    type: object
+
+    properties:
+      id:
+        type: integer
+
       date:
         type: string
-        format: date
+        format: date-time
+
       amount:
         type: number
+        format: float
+
       balance:
         type: number
-      description:
-        $ref: '#/definitions/TransactionDescription'
+        format: float
 
-  TransactionDescription:
+      details:
+        type: object
+        properties:
+          transaction_type:
+            type: string
+
+          category:
+            type: string
+
+          note:
+            type: string
+
+  TransactionUpdate:
     type: object
+
     properties:
       transaction_type:
         type: string
+
       category:
         type: string
+
       note:
         type: string
